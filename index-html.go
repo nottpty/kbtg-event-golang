@@ -19,13 +19,13 @@ var indexTemplate = template.Must(template.New("index").Parse(`<!doctype html>
 		<div class="container">
 			<div class="row">
 				{{range .Events}}
-					<div class="col-4">
-							<div class="card">
-								<h5 class="card-header text-center">{{ .Name }}</h5>
+					<div class="col-4" style="padding-bottom: 15px;">
+							<div class="card border border-success">
+								<h5 class="card-header text-center" style="background-color: #84d57f;">{{ .Name }}</h5>
 								<div class="card-body">
 									<h5 class="card-title">By {{ .Speaker }}</h5>
 									<p class="card-text">{{ .Description }}</p>
-									<a href="/events/{{.ID}}" class="btn btn-info">Go to detail</a>
+									<a href="/events/{{.ID}}" class="btn btn-info" style="background-color: #1e7325;">Go to detail</a>
 								</div>
 							</div>
 					</div>
