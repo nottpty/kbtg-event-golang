@@ -25,7 +25,7 @@ var newEventTemplate = template.Must(template.New("new-event").Parse(`<!doctype 
 						<form method="POST" action="/events/">
 							<div class="form-group">
 								<label for="name">Name</label>
-								<input type="text" class="form-control" name="name" id="name" placeholder="Golang intensive course">
+								<input class="form-control" name="name" id="name" placeholder="Golang intensive course">
 							</div>
 							<div class="form-group">
 								<label for="location">Location</label>
@@ -33,7 +33,7 @@ var newEventTemplate = template.Must(template.New("new-event").Parse(`<!doctype 
 							</div>
 							<div class="form-group">
 								<label for="generation">Generation</label>
-								<input type="text" class="form-control" name="generation" id="generation" placeholder="1">
+								<input class="form-control" name="generation" id="generation" placeholder="1">
 							</div>
 							<div class="form-group">
 								<label for="description">Description</label>
@@ -41,19 +41,19 @@ var newEventTemplate = template.Must(template.New("new-event").Parse(`<!doctype 
 							</div>
 							<div class="form-group">
 								<label for="speaker">Speaker</label>
-								<input type="text" class="form-control" name="speaker" id="speaker" placeholder="Mr.MasterX">
+								<input class="form-control" name="speaker" id="speaker" placeholder="Mr.MasterX">
 							</div>
 							<div class="form-group">
 								<label for="limit">Limit Attendee</label>
-								<input type="text" class="form-control" name="limit" id="limit" placeholder="30">
+								<input class="form-control" name="limit" id="limit" placeholder="30">
 							</div>
 							<div class="form-group">
 								<label for="start">Start Datetime</label>
-								<input type="text" class="form-control" name="start" id="start" placeholder="Jan 2, 2006 at 3:04 PM">
+								<input class="form-control" name="start" id="start" placeholder="Jan 2, 2006 at 3:04 PM">
 							</div>
 							<div class="form-group">
 								<label for="end">End Datetime</label>
-								<input type="text" class="form-control" name="end" id="end" placeholder="Jan 2, 2006 at 3:04 PM">
+								<input class="form-control" name="end" id="end" placeholder="Jan 2, 2006 at 3:04 PM">
 							</div>
 							<div class="text-center"><input class="btn btn-outline-success" type="submit"></div>
 						</form>

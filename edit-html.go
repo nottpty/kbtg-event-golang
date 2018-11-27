@@ -27,7 +27,7 @@ var editTemplate = template.Must(template.New("edit").Parse(`<!doctype html>
 						<form method="POST" action="/events/{{.ID}}/update">
 							<div class="form-group">
 								<label for="name">Name</label>
-								<input type="text" class="form-control" name="name" id="name" value="{{.Name}}">
+								<input class="form-control" name="name" id="name" value="{{.Name}}">
 							</div>
 							<div class="form-group">
 								<label for="location">Location</label>
@@ -35,7 +35,7 @@ var editTemplate = template.Must(template.New("edit").Parse(`<!doctype html>
 							</div>
 							<div class="form-group">
 								<label for="generation">Generation</label>
-								<input type="text" class="form-control" name="generation" id="generation" value="{{.Generation}}">
+								<input class="form-control" name="generation" id="generation" value="{{.Generation}}">
 							</div>
 							<div class="form-group">
 								<label for="description">Description</label>
@@ -43,19 +43,19 @@ var editTemplate = template.Must(template.New("edit").Parse(`<!doctype html>
 							</div>
 							<div class="form-group">
 								<label for="speaker">Speaker</label>
-								<input type="text" class="form-control" name="speaker" id="speaker" value="{{.Speaker}}">
+								<input class="form-control" name="speaker" id="speaker" value="{{.Speaker}}">
 							</div>
 							<div class="form-group">
 								<label for="limit">Limit Attendee</label>
-								<input type="text" class="form-control" name="limit" id="limit" value="{{.LimitAttendee}}">
+								<input class="form-control" name="limit" id="limit" value="{{.LimitAttendee}}">
 							</div>
 							<div class="form-group">
 								<label for="start">Start Datetime</label>
-								<input type="text" class="form-control" name="start" id="start" value="{{.StartDatetime}}">
+								<input class="form-control" name="start" id="start" value="{{.StartDatetime}}">
 							</div>
 							<div class="form-group">
 								<label for="end">End Datetime</label>
-								<input type="text" class="form-control" name="end" id="end" value="{{.EndDatetime}}">
+								<input class="form-control" name="end" id="end" value="{{.EndDatetime}}">
 							</div>
 							<div class="text-center"><input class="btn btn-outline-success" type="submit"></div>
 						</form>

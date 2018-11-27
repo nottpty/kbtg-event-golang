@@ -32,8 +32,7 @@ func ConnectDB() {
 }
 
 func Insert(e *Event) error {
-	r := db.QueryRow("INSERT INTO event(name, location, generation, speaker, description, limit_attendee, amount_attendee, start_datetime, end_datetime) VALUES (?,?,?,?,?,?,?,?,?)", e.Name, e.Location, e.Generation, e.Speaker, e.Description, e.LimitAttendee, e.AmountAttendee, e.StartDatetime, e.EndDatetime)
-	err := r.Scan(&e.ID)
+	_, err := db.Exec("INSERT INTO event(name, location, generation, speaker, description, limit_attendee, amount_attendee, start_datetime, end_datetime) VALUES (?,?,?,?,?,?,?,?,?)", e.Name, e.Location, e.Generation, e.Speaker, e.Description, e.LimitAttendee, e.AmountAttendee, e.StartDatetime, e.EndDatetime)
 	if err != nil {
 		return err
 	}

@@ -168,12 +168,12 @@ func joinEventPageHandler(w http.ResponseWriter, r *http.Request) {
 func addEventHandler(w http.ResponseWriter, r *http.Request) {
 	generation, err := strconv.Atoi(r.PostFormValue("generation"))
 	if err != nil {
-		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "blog gen: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	limit, err := strconv.Atoi(r.PostFormValue("limit"))
 	if err != nil {
-		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "blog limit: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	newEvent := &event.Event{
@@ -191,7 +191,7 @@ func addEventHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, fmt.Sprintf("/posts/%d", newEvent.ID), http.StatusMovedPermanently)
+	http.Redirect(w, r, fmt.Sprintf("/events/%d", newEvent.ID), http.StatusMovedPermanently)
 }
 
 func newEventPageHandler(w http.ResponseWriter, r *http.Request) {
