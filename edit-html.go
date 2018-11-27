@@ -6,27 +6,64 @@ var editTemplate = template.Must(template.New("edit").Parse(`<!doctype html>
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Edit Event</title>
-  </head>
-  <h2>Edit Event</h2>
-  <form method="POST" action="/events/{{.ID}}/update">
-    <h3>Name</h3>
-		<input name="name" value="{{.Name}}"/>
-		<h3>Location</h3>
-		<input name="location" value="{{.Location}}"/>
-		<h3>Generation</h3>
-    <input name="generation" value="{{.Generation}}"/>
-    <h3>Description</h3>
-		<textarea name="description">{{.Description}}</textarea></br>
-		<h3>Speaker</h3>
-		<input name="speaker" value="{{.Speaker}}"/>
-		<h3>Limit Attendee</h3>
-		<input name="limit" value="{{.LimitAttendee}}"/>
-		<h3>Start Datetime</h3>
-		<input name="start" value="{{.StartDatetime}}"/>
-		<h3>End Datetime</h3>
-    <input name="end" value="{{.EndDatetime}}"/>
-    <input type="submit" />
-  </form>
+		<title>Edit Event</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+	</head>
+	<body>
+		<nav class="navbar navbar-dark bg-success">
+			<a class="navbar-brand" href="/events/">Home</a>
+		</nav>
+		<div class="text-center" style="padding-top: 15px; padding-bottom: 15px;">
+			<h1>Edit Event</h1>
+		</div>
+		<form class="text-center" method="POST" action="/events/{{.ID}}/export">
+			<input class="btn btn-outline-info" type="submit" value="Export data to Excel">
+		</form>
+		<div class="container" style="padding-top: 30px; padding-bottom: 15px;">
+			<div class="row">
+				<div class="col-3"></div>
+				<div class="col-6">
+					<div class="container">
+						<form method="POST" action="/events/{{.ID}}/update">
+							<div class="form-group">
+								<label for="name">Name</label>
+								<input type="text" class="form-control" name="name" id="name" value="{{.Name}}">
+							</div>
+							<div class="form-group">
+								<label for="location">Location</label>
+								<textarea class="form-control" name="location" id="location">{{.Location}}</textarea>
+							</div>
+							<div class="form-group">
+								<label for="generation">Generation</label>
+								<input type="text" class="form-control" name="generation" id="generation" value="{{.Generation}}">
+							</div>
+							<div class="form-group">
+								<label for="description">Description</label>
+								<textarea class="form-control" name="description" id="description">{{.Description}}</textarea>
+							</div>
+							<div class="form-group">
+								<label for="speaker">Speaker</label>
+								<input type="text" class="form-control" name="speaker" id="speaker" value="{{.Speaker}}">
+							</div>
+							<div class="form-group">
+								<label for="limit">Limit Attendee</label>
+								<input type="text" class="form-control" name="limit" id="limit" value="{{.LimitAttendee}}">
+							</div>
+							<div class="form-group">
+								<label for="start">Start Datetime</label>
+								<input type="text" class="form-control" name="start" id="start" value="{{.StartDatetime}}">
+							</div>
+							<div class="form-group">
+								<label for="end">End Datetime</label>
+								<input type="text" class="form-control" name="end" id="end" value="{{.EndDatetime}}">
+							</div>
+							<div class="text-center"><input class="btn btn-outline-success" type="submit"></div>
+						</form>
+					</div>
+				</div>
+				<div class="col-3"></div>
+			</div>
+		</div>
+	</body>
 </html>
 `))

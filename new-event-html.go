@@ -7,29 +7,61 @@ var newEventTemplate = template.Must(template.New("new-event").Parse(`<!doctype 
   <head>
     <meta charset="UTF-8">
 		<title>New Event</title>
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
   </head>
-  <body>
-    <h2>New Event</h2>
-    <form method="POST" action="/events/">
-      <h3>Name event</h3>
-      <input name="name" />
-      <h3>Description</h3>
-			<textarea name="description"></textarea></br>
-			<h3>Location</h3>
-			<textarea name="location"></textarea></br>
-			<h3>Generation</h3>
-			<input name="generation" />
-			<h3>Speaker</h3>
-			<input name="speaker" />
-			<h3>Limit Attendee</h3>
-			<input name="limit" />
-			<h3>Start Datetime</h3>
-			<input value="Jan 2, 2006 at 3:04 PM" name="start" />
-			<h3>End Datetime</h3>
-			<input value="Jan 2, 2006 at 3:04 PM" name="end" />
-      <input type="submit" />
-		</form>
+	<body>
+		<nav class="navbar navbar-dark bg-success">
+			<a class="navbar-brand" href="/events/">Home</a>
+		</nav>
+
+		<div class="text-center" style="padding-top: 15px; padding-bottom: 15px;">
+			<h1>Create Event</h1>
+		</div>
+		<div class="container" style="padding-top: 15px; padding-bottom: 15px;">
+			<div class="row">
+				<div class="col-3"></div>
+				<div class="col-6">
+					<div class="container">
+						<form method="POST" action="/events/">
+							<div class="form-group">
+								<label for="name">Name</label>
+								<input type="text" class="form-control" name="name" id="name" placeholder="Golang intensive course">
+							</div>
+							<div class="form-group">
+								<label for="location">Location</label>
+								<textarea class="form-control" name="location" id="location" placeholder="KBTG"></textarea>
+							</div>
+							<div class="form-group">
+								<label for="generation">Generation</label>
+								<input type="text" class="form-control" name="generation" id="generation" placeholder="1">
+							</div>
+							<div class="form-group">
+								<label for="description">Description</label>
+								<textarea class="form-control" name="description" id="description" placeholder="For beginner to expert"></textarea>
+							</div>
+							<div class="form-group">
+								<label for="speaker">Speaker</label>
+								<input type="text" class="form-control" name="speaker" id="speaker" placeholder="Mr.MasterX">
+							</div>
+							<div class="form-group">
+								<label for="limit">Limit Attendee</label>
+								<input type="text" class="form-control" name="limit" id="limit" placeholder="30">
+							</div>
+							<div class="form-group">
+								<label for="start">Start Datetime</label>
+								<input type="text" class="form-control" name="start" id="start" placeholder="Jan 2, 2006 at 3:04 PM">
+							</div>
+							<div class="form-group">
+								<label for="end">End Datetime</label>
+								<input type="text" class="form-control" name="end" id="end" placeholder="Jan 2, 2006 at 3:04 PM">
+							</div>
+							<div class="text-center"><input class="btn btn-outline-success" type="submit"></div>
+						</form>
+					</div>
+				</div>
+				<div class="col-3"></div>
+			</div>
+		</div>
   </body>
 </html>
 `))

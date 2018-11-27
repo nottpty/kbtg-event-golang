@@ -75,7 +75,7 @@ func exportDataHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	http.Redirect(w, r, fmt.Sprintf("/events/%d", e.ID), http.StatusMovedPermanently)
+	http.Redirect(w, r, fmt.Sprintf("/events/%d/edit", e.ID), http.StatusMovedPermanently)
 }
 
 func eventPageHandler(w http.ResponseWriter, r *http.Request) {
