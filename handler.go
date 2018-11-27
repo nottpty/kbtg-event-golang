@@ -6,22 +6,22 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 	"web-event/pq/event"
-	"web-event/pq/post"
+
+	"github.com/Luxurioust/excelize"
 )
 
 func indexPageHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	posts, err := post.All()
+	events, err := event.All()
 	if err != nil {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	data := struct {
-		Posts []post.Post
+		Events []event.Event
 	}{
-		Posts: posts,
+		Events: events,
 	}
 	err = indexTemplate.Execute(w, data)
 	if err != nil {
@@ -30,78 +30,139 @@ func indexPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func postPageHandler(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(strings.TrimPrefix(r.URL.Path, "/posts/"))
+func exportDataHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/events/"), "/export"))
 	if err != nil {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	p, err := post.FindByID(id)
+	e, err := event.FindByID(id)
 	if err != nil {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = postTemplate.Execute(w, p)
+	logAttendees, err := event.AllLog(e.Name)
+	if err != nil {
+		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	data := struct {
+		LogAttendees []event.LogAttendee
+	}{
+		LogAttendees: logAttendees,
+	}
+	// cols := []string{"A", "B", "C", "D", "E", "F"}
+	xlsx := excelize.NewFile()
+	// Set value of a cell.
+	xlsx.SetCellValue("Sheet1", "A1", "ID")
+	xlsx.SetCellValue("Sheet1", "B1", "Event name")
+	xlsx.SetCellValue("Sheet1", "C1", "User ID")
+	xlsx.SetCellValue("Sheet1", "D1", "First name")
+	xlsx.SetCellValue("Sheet1", "E1", "Last name")
+	xlsx.SetCellValue("Sheet1", "F1", "Phone number")
+
+	for index, atd := range data.LogAttendees {
+		index := strconv.Itoa(index + 2)
+		xlsx.SetCellValue("Sheet1", "A"+index, atd.ID)
+		xlsx.SetCellValue("Sheet1", "B"+index, atd.EventName)
+		xlsx.SetCellValue("Sheet1", "C"+index, atd.UserID)
+		xlsx.SetCellValue("Sheet1", "D"+index, atd.FirstName)
+		xlsx.SetCellValue("Sheet1", "E"+index, atd.LastName)
+		xlsx.SetCellValue("Sheet1", "F"+index, atd.PhoneNumber)
+	}
+	// Save xlsx file by the given path.
+	err = xlsx.SaveAs("./" + e.Name + "-attendees.xlsx")
+	if err != nil {
+		fmt.Println(err)
+	}
+	http.Redirect(w, r, fmt.Sprintf("/events/%d", e.ID), http.StatusMovedPermanently)
+}
+
+func eventPageHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(strings.TrimPrefix(r.URL.Path, "/events/"))
+	if err != nil {
+		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	e, err := event.FindByID(id)
+	if err != nil {
+		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = eventTemplate.Execute(w, e)
 	if err != nil {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
-func addCommentHandler(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/posts/"), "/comment"))
+func updateEventHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/events/"), "/update"))
 	if err != nil {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	p, err := post.FindByID(id)
+	e, err := event.FindByID(id)
 	if err != nil {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	var newComment post.Comment
-	newComment.Body = r.PostFormValue("body")
-	err = post.AddComment(p, &newComment)
+	generation, err := strconv.Atoi(r.PostFormValue("generation"))
 	if err != nil {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, fmt.Sprintf("/posts/%d", p.ID), http.StatusMovedPermanently)
+	limit, err := strconv.Atoi(r.PostFormValue("limit"))
+	if err != nil {
+		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	e.Name = r.PostFormValue("name")
+	e.Location = r.PostFormValue("location")
+	e.Generation = generation
+	e.Speaker = r.PostFormValue("speaker")
+	e.Description = r.PostFormValue("description")
+	e.LimitAttendee = limit
+	e.StartDatetime = r.PostFormValue("start")
+	e.EndDatetime = r.PostFormValue("end")
+	err = event.Save(e)
+	if err != nil {
+		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, fmt.Sprintf("/events/%d", e.ID), http.StatusMovedPermanently)
 }
 
-func updatePostHandler(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/posts/"), "/update"))
+func joinEventPageHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/events/"), "/join"))
 	if err != nil {
-		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "blog1: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	p, err := post.FindByID(id)
+	e, err := event.FindByID(id)
 	if err != nil {
-		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "blog2: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	p.Title = r.PostFormValue("title")
-	p.Body = r.PostFormValue("body")
-	err = post.Save(p)
+	e.AmountAttendee = e.AmountAttendee + 1
+	newJoiner := &event.LogAttendee{
+		EventName:   e.Name,
+		UserID:      r.PostFormValue("userid"),
+		FirstName:   r.PostFormValue("firstname"),
+		LastName:    r.PostFormValue("lastname"),
+		PhoneNumber: r.PostFormValue("phonenumber"),
+	}
+	err = event.InsertLA(newJoiner)
 	if err != nil {
-		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "blog4: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, fmt.Sprintf("/posts/%d", p.ID), http.StatusMovedPermanently)
-}
-
-func addPostHandler(w http.ResponseWriter, r *http.Request) {
-	newPost := &post.Post{
-		Title: r.PostFormValue("title"),
-		Body:  r.PostFormValue("body"),
-	}
-	err := post.Insert(newPost)
+	err = event.Save(e)
 	if err != nil {
-		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "blog3: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, fmt.Sprintf("/posts/%d", newPost.ID), http.StatusMovedPermanently)
+	http.Redirect(w, r, fmt.Sprintf("/events/%d", e.ID), http.StatusMovedPermanently)
 }
 
 func addEventHandler(w http.ResponseWriter, r *http.Request) {
@@ -115,8 +176,6 @@ func addEventHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	startDate := time.Now()
-	endDate := time.Now()
 	newEvent := &event.Event{
 		Name:          r.PostFormValue("name"),
 		Location:      r.PostFormValue("location"),
@@ -124,8 +183,8 @@ func addEventHandler(w http.ResponseWriter, r *http.Request) {
 		Speaker:       r.PostFormValue("speaker"),
 		Description:   r.PostFormValue("description"),
 		LimitAttendee: limit,
-		StartDatetime: startDate,
-		EndDatetime:   endDate,
+		StartDatetime: r.PostFormValue("start"),
+		EndDatetime:   r.PostFormValue("end"),
 	}
 	err = event.Insert(newEvent)
 	if err != nil {
@@ -133,15 +192,6 @@ func addEventHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, fmt.Sprintf("/posts/%d", newEvent.ID), http.StatusMovedPermanently)
-}
-
-func newPostPageHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	err := newTemplate.Execute(w, nil)
-	if err != nil {
-		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
 }
 
 func newEventPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -153,18 +203,18 @@ func newEventPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func editPostPageHandler(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/posts/"), "/edit"))
+func editEventPageHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/events/"), "/edit"))
 	if err != nil {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	p, err := post.FindByID(id)
+	e, err := event.FindByID(id)
 	if err != nil {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = editTemplate.Execute(w, p)
+	err = editTemplate.Execute(w, e)
 	if err != nil {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -175,24 +225,22 @@ func startServer() error {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Println(r.Method, r.URL.Path)
 		switch {
-		case r.Method == http.MethodGet && r.URL.Path == "/posts/":
+		case r.Method == http.MethodGet && r.URL.Path == "/events/":
 			indexPageHandler(w, r)
-		case r.Method == http.MethodGet && r.URL.Path == "/posts/new":
-			newPostPageHandler(w, r)
 		case r.Method == http.MethodGet && r.URL.Path == "/events/new":
 			newEventPageHandler(w, r)
-		case r.Method == http.MethodPost && r.URL.Path == "/posts/":
-			addPostHandler(w, r)
 		case r.Method == http.MethodPost && r.URL.Path == "/events/":
 			addEventHandler(w, r)
-		case r.Method == http.MethodPost && strings.HasPrefix(r.URL.Path, "/posts/") && strings.HasSuffix(r.URL.Path, "/comment"):
-			addCommentHandler(w, r)
-		case r.Method == http.MethodGet && strings.HasPrefix(r.URL.Path, "/posts/") && strings.HasSuffix(r.URL.Path, "/edit"):
-			editPostPageHandler(w, r)
-		case r.Method == http.MethodPost && strings.HasPrefix(r.URL.Path, "/posts/") && strings.HasSuffix(r.URL.Path, "/update"):
-			updatePostHandler(w, r)
-		case r.Method == http.MethodGet && strings.HasPrefix(r.URL.Path, "/posts/"):
-			postPageHandler(w, r)
+		case r.Method == http.MethodPost && strings.HasPrefix(r.URL.Path, "/events/") && strings.HasSuffix(r.URL.Path, "/join"):
+			joinEventPageHandler(w, r)
+		case r.Method == http.MethodGet && strings.HasPrefix(r.URL.Path, "/events/") && strings.HasSuffix(r.URL.Path, "/edit"):
+			editEventPageHandler(w, r)
+		case r.Method == http.MethodPost && strings.HasPrefix(r.URL.Path, "/events/") && strings.HasSuffix(r.URL.Path, "/update"):
+			updateEventHandler(w, r)
+		case r.Method == http.MethodPost && strings.HasPrefix(r.URL.Path, "/events/") && strings.HasSuffix(r.URL.Path, "/export"):
+			exportDataHandler(w, r)
+		case r.Method == http.MethodGet && strings.HasPrefix(r.URL.Path, "/events/"):
+			eventPageHandler(w, r)
 		}
 	})
 	return http.ListenAndServe(":8000", nil)

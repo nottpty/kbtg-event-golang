@@ -25,12 +25,11 @@ var newEventTemplate = template.Must(template.New("new-event").Parse(`<!doctype 
 			<h3>Limit Attendee</h3>
 			<input name="limit" />
 			<h3>Start Datetime</h3>
-			<input name="start" />
+			<input value="Jan 2, 2006 at 3:04 PM" name="start" />
 			<h3>End Datetime</h3>
-			<input name="end" />
+			<input value="Jan 2, 2006 at 3:04 PM" name="end" />
       <input type="submit" />
 		</form>
-		<button type="submit" value="submit" class="btn btn-success">Submit</button>
   </body>
 </html>
 `))
