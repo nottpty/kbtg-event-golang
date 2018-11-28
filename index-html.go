@@ -6,12 +6,12 @@ var indexTemplate = template.Must(template.New("index").Parse(`<!doctype html>
 <html>
   <head>
     <meta charset="UTF-8">
-		<title>Blog</title>
+		<title>KBTG Event</title>
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
   </head>
 	<body>
 		<nav class="navbar navbar-dark bg-success">
-			<a class="navbar-brand" href="/events/">Home</a>
+			<a class="navbar-brand" href="/events/">HOME</a>
 		</nav>
 		<div class="text-center" style="padding-top: 15px; padding-bottom: 15px;">
 			<h1>Events</h1>

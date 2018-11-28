@@ -11,7 +11,7 @@ var newEventTemplate = template.Must(template.New("new-event").Parse(`<!doctype 
   </head>
 	<body>
 		<nav class="navbar navbar-dark bg-success">
-			<a class="navbar-brand" href="/events/">Home</a>
+			<a class="navbar-brand" href="/events/">HOME</a>
 		</nav>
 
 		<div class="text-center" style="padding-top: 15px; padding-bottom: 15px;">
