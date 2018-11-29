@@ -80,12 +80,6 @@ func FindByID(id int) (*Event, error) {
 	if err != nil {
 		return nil, err
 	}
-	// e.StartDatetime = time.Parse("Jan 2, 2006 at 3:04 PM", e.StartDatetime).String()
-	// if err != nil {
-	// 	http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-	// e.StartDatetime = startDate.String()
 	return &e, nil
 }
 
@@ -96,22 +90,3 @@ func Save(e *Event) error {
 	}
 	return nil
 }
-
-// func Join(e *Event) error {
-// 	_, err := db.Exec("UPDATE event SET amount_attendee = ? WHERE id = ?", e.AmountAttendee, e.ID)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
-
-// func AddComment(p *Event, c *Comment) error {
-// 	r := db.QueryRow("INSERT INTO comments(body, post_id) VALUES (?,?)", c.Body, p.ID)
-// 	err := r.Scan(&c.ID)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	c.PostID = p.ID
-// 	p.Comments = append(p.Comments, *c)
-// 	return nil
-// }
