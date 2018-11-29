@@ -11,7 +11,11 @@ var editTemplate = template.Must(template.New("edit").Parse(`<!doctype html>
 	</head>
 	<body>
 		<nav class="navbar navbar-dark bg-success">
-			<a class="navbar-brand" href="/events/">HOME</a>
+			<div class="w-100 text-center">
+				<form action="/events/">
+					<input class="text-center" style="height: 28px; width: auto;" type="image" src="https://kasikornbank.com/SiteCollectionDocuments/about/img/logo/logo.png" alt="Submit">
+				</form>
+			</div>
 		</nav>
 		<div class="text-center" style="padding-top: 15px; padding-bottom: 15px;">
 			<h1>Edit Event</h1>

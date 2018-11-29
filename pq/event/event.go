@@ -56,6 +56,23 @@ func All() ([]Event, error) {
 	return events, nil
 }
 
+func AllByEventName(eventName string) ([]Event, error) {
+	var events []Event
+	rows, err := db.Query("SELECT * FROM event WHERE name = ? order by id desc", eventName)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var e Event
+		err := rows.Scan(&e.ID, &e.Name, &e.Location, &e.Generation, &e.Speaker, &e.Description, &e.LimitAttendee, &e.AmountAttendee, &e.StartDatetime, &e.EndDatetime)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, e)
+	}
+	return events, nil
+}
+
 func FindByID(id int) (*Event, error) {
 	row := db.QueryRow("SELECT * FROM event WHERE id = ?", id)
 	var e Event
