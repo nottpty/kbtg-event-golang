@@ -33,13 +33,14 @@ var eventTemplate = template.Must(template.New("event").Parse(`<!doctype html>
 					<p>Speaker : {{.Speaker}}</p>
 					<p>Location : {{.Location}}</p>
 					<p>Description : {{.Description}}</p>
+					<p>Time : {{.StartDatetime}} - {{.EndDatetime}}</p>
 				</div>
 				<div class="col-3"></div>
 			</div>
 		</div>
 
 		{{ if lt .AmountAttendee .LimitAttendee }}
-		<div class="container" style="padding-top: 25px; padding-bottom: 15px;">
+		<div class="container" style="padding-top: 15px; padding-bottom: 15px;">
 			<div class="row">
 				<div class="col-3"></div>
 				<div class="col-6">

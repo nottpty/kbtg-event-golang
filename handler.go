@@ -54,7 +54,6 @@ func exportDataHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		LogAttendees: logAttendees,
 	}
-	// cols := []string{"A", "B", "C", "D", "E", "F"}
 	xlsx := excelize.NewFile()
 	// Set value of a cell.
 	xlsx.SetCellValue("Sheet1", "A1", "ID")
@@ -77,7 +76,7 @@ func exportDataHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Save xlsx file by the given path.
 	genStr := strconv.Itoa(e.Generation)
-	err = xlsx.SaveAs("./" + e.Name + "-" + genStr + "-attendees.xlsx")
+	err = xlsx.SaveAs("./excel/" + e.Name + "-" + genStr + "-attendees.xlsx")
 	if err != nil {
 		fmt.Println(err)
 	}
