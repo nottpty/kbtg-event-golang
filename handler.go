@@ -33,34 +33,6 @@ func indexPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func detailEventHandler(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/events/"), "/detail"))
-	if err != nil {
-		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	e, err := event.FindByID(id)
-	if err != nil {
-		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	events, err := event.AllByEventName(e.Name)
-	if err != nil {
-		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	data := struct {
-		Events []event.Event
-	}{
-		Events: events,
-	}
-	err = detailEventTemplate.Execute(w, data)
-	if err != nil {
-		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
 func exportDataHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/events/"), "/export"))
 	if err != nil {
@@ -274,8 +246,6 @@ func startServer() error {
 			updateEventHandler(w, r)
 		case r.Method == http.MethodPost && strings.HasPrefix(r.URL.Path, "/events/") && strings.HasSuffix(r.URL.Path, "/export"):
 			exportDataHandler(w, r)
-		case r.Method == http.MethodGet && strings.HasPrefix(r.URL.Path, "/events/") && strings.HasSuffix(r.URL.Path, "/detail"):
-			detailEventHandler(w, r)
 		case r.Method == http.MethodGet && strings.HasPrefix(r.URL.Path, "/events/"):
 			eventPageHandler(w, r)
 		}
