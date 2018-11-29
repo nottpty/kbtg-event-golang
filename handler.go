@@ -6,10 +6,13 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"web-event/pq/event"
 
 	"github.com/Luxurioust/excelize"
 )
+
+var mu sync.Mutex
 
 func indexPageHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -41,7 +44,7 @@ func exportDataHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	logAttendees, err := event.AllLog(e.Name)
+	logAttendees, err := event.AllLog(e.Name, e.Generation)
 	if err != nil {
 		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -51,27 +54,29 @@ func exportDataHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		LogAttendees: logAttendees,
 	}
-	// cols := []string{"A", "B", "C", "D", "E", "F"}
 	xlsx := excelize.NewFile()
 	// Set value of a cell.
 	xlsx.SetCellValue("Sheet1", "A1", "ID")
 	xlsx.SetCellValue("Sheet1", "B1", "Event name")
-	xlsx.SetCellValue("Sheet1", "C1", "User ID")
-	xlsx.SetCellValue("Sheet1", "D1", "First name")
-	xlsx.SetCellValue("Sheet1", "E1", "Last name")
-	xlsx.SetCellValue("Sheet1", "F1", "Phone number")
+	xlsx.SetCellValue("Sheet1", "C1", "Generation")
+	xlsx.SetCellValue("Sheet1", "D1", "User ID")
+	xlsx.SetCellValue("Sheet1", "E1", "First name")
+	xlsx.SetCellValue("Sheet1", "F1", "Last name")
+	xlsx.SetCellValue("Sheet1", "G1", "Phone number")
 
 	for index, atd := range data.LogAttendees {
 		index := strconv.Itoa(index + 2)
 		xlsx.SetCellValue("Sheet1", "A"+index, atd.ID)
 		xlsx.SetCellValue("Sheet1", "B"+index, atd.EventName)
-		xlsx.SetCellValue("Sheet1", "C"+index, atd.UserID)
-		xlsx.SetCellValue("Sheet1", "D"+index, atd.FirstName)
-		xlsx.SetCellValue("Sheet1", "E"+index, atd.LastName)
-		xlsx.SetCellValue("Sheet1", "F"+index, atd.PhoneNumber)
+		xlsx.SetCellValue("Sheet1", "C"+index, atd.Generation)
+		xlsx.SetCellValue("Sheet1", "D"+index, atd.UserID)
+		xlsx.SetCellValue("Sheet1", "E"+index, atd.FirstName)
+		xlsx.SetCellValue("Sheet1", "F"+index, atd.LastName)
+		xlsx.SetCellValue("Sheet1", "G"+index, atd.PhoneNumber)
 	}
 	// Save xlsx file by the given path.
-	err = xlsx.SaveAs("./" + e.Name + "-attendees.xlsx")
+	genStr := strconv.Itoa(e.Generation)
+	err = xlsx.SaveAs("./excel/" + e.Name + "-" + genStr + "-attendees.xlsx")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -147,6 +152,7 @@ func joinEventPageHandler(w http.ResponseWriter, r *http.Request) {
 	e.AmountAttendee = e.AmountAttendee + 1
 	newJoiner := &event.LogAttendee{
 		EventName:   e.Name,
+		Generation:  e.Generation,
 		UserID:      r.PostFormValue("userid"),
 		FirstName:   r.PostFormValue("firstname"),
 		LastName:    r.PostFormValue("lastname"),
@@ -186,12 +192,8 @@ func addEventHandler(w http.ResponseWriter, r *http.Request) {
 		StartDatetime: r.PostFormValue("start"),
 		EndDatetime:   r.PostFormValue("end"),
 	}
-	err = event.Insert(newEvent)
-	if err != nil {
-		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	http.Redirect(w, r, fmt.Sprintf("/events/%d", newEvent.ID), http.StatusMovedPermanently)
+	event.Insert(newEvent)
+	http.Redirect(w, r, fmt.Sprint("/events/"), http.StatusMovedPermanently)
 }
 
 func newEventPageHandler(w http.ResponseWriter, r *http.Request) {

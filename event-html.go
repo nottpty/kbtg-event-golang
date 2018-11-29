@@ -11,21 +11,40 @@ var eventTemplate = template.Must(template.New("event").Parse(`<!doctype html>
   </head>
   <body>
 		<nav class="navbar navbar-dark bg-success">
-			<a class="navbar-brand" href="/events/">HOME</a>
+			<div class="w-100 text-center">
+				<form action="/events/">
+					<input class="text-center" style="height: 28px; width: auto;" type="image" src="https://kasikornbank.com/SiteCollectionDocuments/about/img/logo/logo.png" alt="Submit">
+				</form>
+			</div>
 		</nav>
 		<div class="text-center" style="padding-top: 15px; padding-bottom: 15px;">
 			<h1>{{.Name}}</h1>
 		</div>
-		<div class="text-center">
+		<!-- <div class="text-center">
 			<p>Amount of attendees : {{.AmountAttendee}}</p>
-		</div>
+		</div> -->
 
-		{{ if lt .AmountAttendee .LimitAttendee }}
-		<div class="container" style="padding-top: 25px; padding-bottom: 15px;">
+		<div class="container" style="padding-top: 15px; padding-bottom: 15px;">
 			<div class="row">
 				<div class="col-3"></div>
 				<div class="col-6">
-					<div class="container">
+					<p>Generation : {{.Generation}}</p>
+					<p>Amount of attendees : {{.AmountAttendee}}</p>
+					<p>Speaker : {{.Speaker}}</p>
+					<p>Location : {{.Location}}</p>
+					<p>Description : {{.Description}}</p>
+					<p>Time : {{.StartDatetime}} - {{.EndDatetime}}</p>
+				</div>
+				<div class="col-3"></div>
+			</div>
+		</div>
+
+		{{ if lt .AmountAttendee .LimitAttendee }}
+		<div class="container" style="padding-top: 15px; padding-bottom: 15px;">
+			<div class="row">
+				<div class="col-3"></div>
+				<div class="col-6">
+					
 						<form method="POST" action="/events/{{.ID}}/join">
 							<div class="form-group">
 								<label for="userid">User ID</label>
@@ -47,7 +66,7 @@ var eventTemplate = template.Must(template.New("event").Parse(`<!doctype html>
 							<div class="text-center"><input class="btn btn-outline-success" type="submit" value="Join event"></div>
 							
 						</form>
-					</div>
+					
 				</div>
 				<div class="col-3"></div>
 			</div>

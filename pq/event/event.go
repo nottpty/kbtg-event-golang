@@ -32,7 +32,8 @@ func ConnectDB() {
 }
 
 func Insert(e *Event) error {
-	_, err := db.Exec("INSERT INTO event(name, location, generation, speaker, description, limit_attendee, amount_attendee, start_datetime, end_datetime) VALUES (?,?,?,?,?,?,?,?,?)", e.Name, e.Location, e.Generation, e.Speaker, e.Description, e.LimitAttendee, e.AmountAttendee, e.StartDatetime, e.EndDatetime)
+	r := db.QueryRow("INSERT INTO event(name, location, generation, speaker, description, limit_attendee, amount_attendee, start_datetime, end_datetime) VALUES (?,?,?,?,?,?,?,?,?)", e.Name, e.Location, e.Generation, e.Speaker, e.Description, e.LimitAttendee, e.AmountAttendee, e.StartDatetime, e.EndDatetime)
+	err := r.Scan(&e.ID, &e.Name, &e.Location, &e.Generation, &e.Speaker, &e.Description, &e.LimitAttendee, &e.AmountAttendee, &e.StartDatetime, &e.EndDatetime)
 	if err != nil {
 		return err
 	}
@@ -56,6 +57,23 @@ func All() ([]Event, error) {
 	return events, nil
 }
 
+func AllByEventName(eventName string) ([]Event, error) {
+	var events []Event
+	rows, err := db.Query("SELECT * FROM event WHERE name = ? order by id desc", eventName)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var e Event
+		err := rows.Scan(&e.ID, &e.Name, &e.Location, &e.Generation, &e.Speaker, &e.Description, &e.LimitAttendee, &e.AmountAttendee, &e.StartDatetime, &e.EndDatetime)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, e)
+	}
+	return events, nil
+}
+
 func FindByID(id int) (*Event, error) {
 	row := db.QueryRow("SELECT * FROM event WHERE id = ?", id)
 	var e Event
@@ -63,12 +81,6 @@ func FindByID(id int) (*Event, error) {
 	if err != nil {
 		return nil, err
 	}
-	// e.StartDatetime = time.Parse("Jan 2, 2006 at 3:04 PM", e.StartDatetime).String()
-	// if err != nil {
-	// 	http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-	// e.StartDatetime = startDate.String()
 	return &e, nil
 }
 
@@ -79,22 +91,3 @@ func Save(e *Event) error {
 	}
 	return nil
 }
-
-// func Join(e *Event) error {
-// 	_, err := db.Exec("UPDATE event SET amount_attendee = ? WHERE id = ?", e.AmountAttendee, e.ID)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
-
-// func AddComment(p *Event, c *Comment) error {
-// 	r := db.QueryRow("INSERT INTO comments(body, post_id) VALUES (?,?)", c.Body, p.ID)
-// 	err := r.Scan(&c.ID)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	c.PostID = p.ID
-// 	p.Comments = append(p.Comments, *c)
-// 	return nil
-// }
