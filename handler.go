@@ -192,12 +192,8 @@ func addEventHandler(w http.ResponseWriter, r *http.Request) {
 		StartDatetime: r.PostFormValue("start"),
 		EndDatetime:   r.PostFormValue("end"),
 	}
-	err = event.Insert(newEvent)
-	if err != nil {
-		http.Error(w, "blog: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	http.Redirect(w, r, fmt.Sprintf("/events/%d", newEvent.ID), http.StatusMovedPermanently)
+	event.Insert(newEvent)
+	http.Redirect(w, r, fmt.Sprint("/events/"), http.StatusMovedPermanently)
 }
 
 func newEventPageHandler(w http.ResponseWriter, r *http.Request) {

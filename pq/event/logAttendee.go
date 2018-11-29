@@ -11,7 +11,7 @@ type LogAttendee struct {
 }
 
 func InsertLA(la *LogAttendee) error {
-	_, err := db.Exec("INSERT INTO log_attendee(event_name, generation, user_id, first_name, last_name, phone_number) VALUES (?,?,?,?,?)", la.EventName, la.Generation, la.UserID, la.FirstName, la.LastName, la.PhoneNumber)
+	_, err := db.Exec("INSERT INTO log_attendee(event_name, generation, user_id, first_name, last_name, phone_number) VALUES (?,?,?,?,?,?)", la.EventName, la.Generation, la.UserID, la.FirstName, la.LastName, la.PhoneNumber)
 	if err != nil {
 		return err
 	}
